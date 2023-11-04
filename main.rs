@@ -1,5 +1,9 @@
 use std::collections::HashMap;
 
+// Note:
+// 1. the linked list is FIFO, push to head, pop from the tail
+
+
 struct Order {
   order_id: u64,
   is_buy: bool,
@@ -66,6 +70,31 @@ fn add_order(ob: &mut OrderBook, mut order: Order) {
   ob.orders_ownership_map.insert(order_id, order);
 }
 
+fn drain_limit(shares_to_execute: u64, best_sell_limit: &mut Limit) -> (u64, bool) {
+  // 1. while limit->tail_order != NULL and shares_to_execute > 0:
+  // 1.1 let curr_shares = limit->tail_order->shares
+  // 1.2 if curr_shares > shares_to_execute:
+  // 1.2.1 limit->tail_order->shares = curr_shares - shares_to_execute
+  // 1.2.2 shares_to_execute = 0 and break
+  // 1.3 else:
+  // 1.3.1 limit->tail_order = limit->tail_order->prev
+  // 1.3.2 shares_to_execute -= limit->tail_order->shares
+  // 1.3.3 remove tail_order and remove this order from hash map
+  // 1.3.4 handle the head pointer edge cases when we approach one-node list (don't consider empty list because when it's empty we kick this limit out)
+  // 1.4 if the limit's linked list is empty now, signal delete: delete this limit from tree and hash map (we don't delete immediately because we want to use it to find the predecessor in the parent function)
+  // return shares_to_execute, delete
+}
+
+fn execute_buy_order(shares_to_execute: u64, expected_price: u64) {
+  // 1. while shares_to_execute > 0 and best_sell_price is not NULL we do:
+  // 1.1 Get the best sell Limit price best_sell_price (we keep track of this Limit object in the OrderBook struct so O(1)). Note this is always the smallest price in the sell tree, which is physically the leftmost node.
+  // 1.2 If best_sell_price > expected price: break
+  // 1.3 Execute as much as we can, call drain_limit(), update shares_to_execute
+  // 1.4 If signalled to delete:
+  // 1.4.1 Find its largest predecessor, set as the best_sell_price in OrderBook struct, delete the Limit
+  // 1.5 If shares_to_execute == 0, means execution is done, return
+  // 1.6 If shares_to_execute > 0, means we need to add this one to the buy tree, add the new Order at the Limit price, call add_order()
+}
 
 /* ---------------------------------------------------------------------- */
 /* ------------------------ test helpers -------------------------------- */
