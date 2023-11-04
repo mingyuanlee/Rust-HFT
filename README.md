@@ -33,3 +33,8 @@ we use red-black tree because we put emphasis on insertions and deletions instea
 
 Thoughts:
 Can we make it a distributed orderbook using Kademlia?
+
+
+## Reference
+
+https://carmona.princeton.edu/sites/g/files/toruqf5466/files/documents/Purdue1.pdf
